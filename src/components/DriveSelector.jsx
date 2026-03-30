@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { FolderOpen, Download, Smartphone, Monitor, AlertCircle, Shield } from 'lucide-react';
+import { FolderOpen, Download, AlertCircle, Shield } from 'lucide-react';
 import { supportsFileSystemAccess, isMobile, captureInstallPrompt, triggerInstallPrompt, isInstallable } from '../hooks/useScan';
 
-export default function DriveSelector({ onSelectDrive, scanning }) {
+export default function DriveSelector({ onSelectDrive, onMobileScan, scanning }) {
   const [installable, setInstallable] = useState(false);
   const hasAPI = supportsFileSystemAccess();
   const mobile = isMobile();
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     captureInstallPrompt();
@@ -25,6 +26,13 @@ export default function DriveSelector({ onSelectDrive, scanning }) {
       if (err.name !== 'AbortError') {
         console.error('Folder picker error:', err);
       }
+    }
+  };
+
+  const handleMobileFolderSelect = (e) => {
+    const files = e.target.files;
+    if (files && files.length > 0 && onMobileScan) {
+      onMobileScan(files);
     }
   };
 
@@ -55,14 +63,14 @@ export default function DriveSelector({ onSelectDrive, scanning }) {
               <div className="w-16 h-16 mx-auto rounded-2xl bg-blue-500/10 flex items-center justify-center mb-4 group-hover:bg-blue-500/20 transition-colors">
                 <FolderOpen size={32} className="text-blue-400" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Select a Folder to Scan</h3>
+              <h3 className="text-xl font-bold text-white mb-2">Select Any Folder to Scan</h3>
               <p className="text-gray-400 text-sm max-w-md mx-auto">
-                Choose any folder on your computer. Mono Lens will analyze all files and subdirectories
-                to show you exactly where your disk space is going.
+                Pick any folder or drive on your computer. Mono Lens will analyze all files
+                and subdirectories to show you exactly where your disk space is going.
               </p>
               <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600/10 text-blue-400 text-sm font-medium">
                 <FolderOpen size={16} />
-                Browse Folders
+                Browse & Select
               </div>
             </div>
           </motion.button>
@@ -86,50 +94,75 @@ export default function DriveSelector({ onSelectDrive, scanning }) {
         </motion.div>
       )}
 
-      {/* ─── Mobile: Install Prompt ─── */}
+      {/* ─── Mobile: Folder Scanner ─── */}
       {mobile && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="space-y-4"
         >
-          <div className="rounded-2xl border border-dark-600 p-8 text-center"
-            style={{ background: 'var(--bg-card)' }}>
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-orange-500/10 flex items-center justify-center mb-4">
-              <Smartphone size={32} className="text-orange-400" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">Install Mono Lens</h3>
-            <p className="text-gray-400 text-sm max-w-md mx-auto mb-6">
-              For the best experience on mobile, install Mono Lens as an app.
-              It works offline and gets automatic updates.
-            </p>
+          {/* Hidden file input for mobile folder selection */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            // @ts-ignore
+            webkitdirectory=""
+            directory=""
+            multiple
+            onChange={handleMobileFolderSelect}
+            style={{ display: 'none' }}
+          />
 
-            {installable ? (
-              <button
-                onClick={handleInstall}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl transition-colors"
-              >
-                <Download size={18} />
-                Install Mono Lens
-              </button>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-gray-500 text-xs">
-                  To install: tap the browser menu (three dots) and select "Add to Home Screen" or "Install App"
-                </p>
-              </div>
-            )}
+          <div
+            className="rounded-2xl border-2 border-dashed border-dark-500 hover:border-blue-500/50 p-8 text-center cursor-pointer transition-all"
+            style={{ background: 'var(--bg-card)' }}
+            onClick={() => !scanning && fileInputRef.current?.click()}
+          >
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-blue-500/10 flex items-center justify-center mb-4">
+              <FolderOpen size={32} className="text-blue-400" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Select a Folder to Scan</h3>
+            <p className="text-gray-400 text-sm max-w-md mx-auto mb-4">
+              Choose any folder on your phone. Mono Lens will analyze all files
+              and show you where your storage is going.
+            </p>
+            <div className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl transition-colors">
+              <FolderOpen size={18} />
+              Select Folder
+            </div>
           </div>
 
-          {/* Desktop alternative */}
+          {/* Privacy notice */}
           <div className="flex items-start gap-3 rounded-xl border border-dark-600 p-4"
             style={{ background: 'var(--bg-card)' }}>
-            <Monitor size={18} className="text-blue-400 flex-shrink-0 mt-0.5" />
+            <Shield size={18} className="text-emerald-400 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-gray-400">
-              <span className="text-white font-medium">Full disk scanning</span> is available
-              on desktop browsers (Chrome, Edge). Open this site on your computer for the complete experience.
+              <span className="text-white font-medium">100% Private</span> — Files are analyzed
+              directly on your device. Nothing is uploaded.
             </p>
           </div>
+
+          {/* Install as app option */}
+          {installable && (
+            <div className="rounded-xl border border-dark-600 p-4"
+              style={{ background: 'var(--bg-card)' }}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Download size={18} className="text-purple-400" />
+                  <div>
+                    <p className="text-sm text-white font-medium">Install as App</p>
+                    <p className="text-xs text-gray-500">Works offline with auto-updates</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleInstall}
+                  className="px-4 py-2 bg-purple-600/10 text-purple-400 hover:bg-purple-600/20 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Install
+                </button>
+              </div>
+            </div>
+          )}
         </motion.div>
       )}
 

@@ -84,7 +84,7 @@ export default function App() {
 
   const {
     status, summary, files, filesMeta, error, scanProgress, scanId,
-    startScan, loadFiles, reset,
+    startScan, startMobileScan, loadFiles, reset,
   } = useScan();
 
   const [tab, setTab] = useState('overview');
@@ -101,6 +101,15 @@ export default function App() {
     startScan(handle);
   };
 
+  const handleMobileScan = (fileList) => {
+    const firstPath = fileList[0]?.webkitRelativePath || '';
+    const rootFolder = firstPath.split('/')[0] || 'Selected Folder';
+    setFolderName(rootFolder);
+    setDirHandle(null);
+    setTab('overview');
+    startMobileScan(fileList);
+  };
+
   const handleBack = () => {
     reset();
     setFolderName('');
@@ -109,7 +118,9 @@ export default function App() {
   };
 
   const handleRescan = () => {
-    if (dirHandle) startScan(dirHandle);
+    if (dirHandle) {
+      startScan(dirHandle);
+    }
   };
 
   const loadTrash = async () => {
@@ -263,7 +274,7 @@ export default function App() {
                   nothing is uploaded, everything stays private.
                 </motion.p>
               </div>
-              <DriveSelector onSelectDrive={handleSelectDrive} scanning={false} />
+              <DriveSelector onSelectDrive={handleSelectDrive} onMobileScan={handleMobileScan} scanning={false} />
             </motion.div>
           )}
 

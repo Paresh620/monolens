@@ -122,6 +122,28 @@ function buildSummary(files, dirCount) {
   };
 }
 
+// ─── Mobile Fallback: Parse <input webkitdirectory> files ──
+
+function parseMobileFiles(fileList) {
+  const files = [];
+  for (const file of fileList) {
+    const ext = getExtension(file.name);
+    files.push({
+      name: file.name,
+      path: file.webkitRelativePath || file.name,
+      size: file.size,
+      modified: file.lastModified,
+      ext,
+      category: getCategory(ext),
+      type: 'file',
+      _handle: null,
+      _parentHandle: null,
+      _blob: file,
+    });
+  }
+  return files;
+}
+
 // ─── Main Hook ──────────────────────────────────────────
 
 export function useScan() {
@@ -205,6 +227,38 @@ export function useScan() {
     }
   }, [applyFilters]);
 
+  const startMobileScan = useCallback((fileList) => {
+    if (!fileList || fileList.length === 0) return;
+
+    setStatus('scanning');
+    setError(null);
+    setSummary(null);
+    setAllFiles([]);
+    setFiles([]);
+    setScanProgress(0);
+
+    const parsedFiles = parseMobileFiles(fileList);
+    setScanProgress(parsedFiles.length);
+
+    // Count unique directories
+    const dirs = new Set();
+    for (const f of parsedFiles) {
+      const parts = f.path.split('/');
+      if (parts.length > 1) {
+        for (let i = 1; i < parts.length; i++) {
+          dirs.add(parts.slice(0, i).join('/'));
+        }
+      }
+    }
+
+    const summaryData = buildSummary(parsedFiles, dirs.size);
+    setSummary(summaryData);
+    setAllFiles(parsedFiles);
+    allFilesRef.current = parsedFiles;
+    setStatus('complete');
+    applyFilters(parsedFiles, { page: 1, sort: 'size', order: 'desc' });
+  }, [applyFilters]);
+
   const loadFiles = useCallback((_scanId, params = {}) => {
     applyFilters(allFilesRef.current, params);
   }, [applyFilters]);
@@ -224,7 +278,7 @@ export function useScan() {
   return {
     status, scanId: 'local', summary, files, filesMeta, error, scanProgress,
     allFiles,
-    startScan, loadFiles, reset,
+    startScan, startMobileScan, loadFiles, reset,
   };
 }
 
@@ -316,6 +370,16 @@ export async function openFile(file) {
       return { success: false, error: err.message };
     }
   }
+  if (file._blob) {
+    try {
+      const url = URL.createObjectURL(file._blob);
+      window.open(url, '_blank');
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }
   return { success: false, error: 'No file handle available' };
 }
 
@@ -328,15 +392,24 @@ export function getThumbnailUrl() {
 }
 
 export async function getFileThumbnailBlob(file) {
-  if (!file?._handle) return null;
-  const ext = (file.ext || '').toLowerCase();
+  const ext = (file?.ext || '').toLowerCase();
   if (!IMAGE_EXTS.has(ext)) return null;
-  try {
-    const f = await file._handle.getFile();
-    return URL.createObjectURL(f);
-  } catch {
-    return null;
+  if (file._handle) {
+    try {
+      const f = await file._handle.getFile();
+      return URL.createObjectURL(f);
+    } catch {
+      return null;
+    }
   }
+  if (file._blob) {
+    try {
+      return URL.createObjectURL(file._blob);
+    } catch {
+      return null;
+    }
+  }
+  return null;
 }
 
 // ─── PWA Install Prompt ────────────────────────────────
