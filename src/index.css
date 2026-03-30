@@ -1,0 +1,321 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════
+   DiskLens — Dual Theme System (CSS Custom Properties)
+   ═══════════════════════════════════════════════════════ */
+
+/* ─── Night Mode (Default) ─── */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  /* Backgrounds */
+  --bg-body:       #0B0F14;
+  --bg-surface:    #111827;
+  --bg-card:       rgba(255, 255, 255, 0.03);
+  --bg-elevated:   #1a1a30;
+  --bg-input:      #0d0d1c;
+  --bg-inset:      #0a0a16;
+  --bg-hover:      rgba(255, 255, 255, 0.04);
+  --bg-active:     rgba(59, 130, 246, 0.1);
+  --bg-overlay:    rgba(0, 0, 0, 0.70);
+
+  /* Text */
+  --text-primary:   #E5E7EB;
+  --text-secondary: #9CA3AF;
+  --text-muted:     #6B7280;
+  --text-faint:     #4B5563;
+  --text-heading:   #F9FAFB;
+
+  /* Borders */
+  --border:        rgba(255, 255, 255, 0.06);
+  --border-hover:  rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.15);
+
+  /* Scrollbar */
+  --scrollbar-track: #111827;
+  --scrollbar-thumb: #2d2d50;
+  --scrollbar-hover: #505080;
+
+  /* Shimmer */
+  --shimmer-a: #16162d;
+  --shimmer-b: #1e1e3a;
+
+  /* Chart axis text */
+  --chart-axis:    #9CA3AF;
+  --chart-label:   #D1D5DB;
+  --chart-grid:    rgba(255, 255, 255, 0.06);
+
+  /* Component-specific tokens */
+  --card-shadow:       0 1px 3px rgba(0, 0, 0, 0.3);
+  --card-bg-solid:     #0f0f20;
+  --tooltip-bg:        rgba(10, 10, 22, 0.95);
+  --context-menu-bg:   rgba(15, 15, 32, 0.95);
+  --badge-bg:          rgba(255, 255, 255, 0.03);
+  --progress-track:    #1e1e3a;
+  --divider:           rgba(255, 255, 255, 0.06);
+
+  /* TreeMap specific */
+  --treemap-bg:        linear-gradient(135deg, #080810 0%, #0c0c1a 50%, #0a0a14 100%);
+  --treemap-container: linear-gradient(180deg, #0d0d1a 0%, #111122 100%);
+  --treemap-empty:     linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+  --block-border:      rgba(255, 255, 255, 0.06);
+  --block-border-hover: currentColor;
+}
+
+/* ─── Day Mode ─── */
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Backgrounds */
+  --bg-body:       #F9FAFB;
+  --bg-surface:    #FFFFFF;
+  --bg-card:       #FFFFFF;
+  --bg-elevated:   #F3F4F6;
+  --bg-input:      #F9FAFB;
+  --bg-inset:      #F3F4F6;
+  --bg-hover:      rgba(0, 0, 0, 0.03);
+  --bg-active:     rgba(59, 130, 246, 0.08);
+  --bg-overlay:    rgba(0, 0, 0, 0.40);
+
+  /* Text */
+  --text-primary:   #111827;
+  --text-secondary: #4B5563;
+  --text-muted:     #6B7280;
+  --text-faint:     #9CA3AF;
+  --text-heading:   #030712;
+
+  /* Borders */
+  --border:        #E5E7EB;
+  --border-hover:  #D1D5DB;
+  --border-strong: #CBD5E1;
+
+  /* Scrollbar */
+  --scrollbar-track: #F3F4F6;
+  --scrollbar-thumb: #CBD5E1;
+  --scrollbar-hover: #9CA3AF;
+
+  /* Shimmer */
+  --shimmer-a: #E5E7EB;
+  --shimmer-b: #F3F4F6;
+
+  /* Chart axis text */
+  --chart-axis:    #6B7280;
+  --chart-label:   #374151;
+  --chart-grid:    rgba(0, 0, 0, 0.08);
+
+  /* Component-specific tokens */
+  --card-shadow:       0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --card-bg-solid:     #FFFFFF;
+  --tooltip-bg:        rgba(255, 255, 255, 0.97);
+  --context-menu-bg:   rgba(255, 255, 255, 0.97);
+  --badge-bg:          #F3F4F6;
+  --progress-track:    #E5E7EB;
+  --divider:           #E5E7EB;
+
+  /* TreeMap specific */
+  --treemap-bg:        linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 50%, #F3F4F6 100%);
+  --treemap-container: #FFFFFF;
+  --treemap-empty:     #F9FAFB;
+  --block-border:      rgba(0, 0, 0, 0.08);
+  --block-border-hover: currentColor;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Base Element Styles
+   ═══════════════════════════════════════════════════════ */
+
+body {
+  margin: 0;
+  background: var(--bg-body);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Light Mode — Tailwind Class Overrides
+   Complete mapping of dark-themed Tailwind utilities
+   ═══════════════════════════════════════════════════════ */
+
+/* ─── Background Colors ─── */
+[data-theme="light"] .bg-dark-950  { background: var(--bg-body) !important; }
+[data-theme="light"] .bg-dark-900  { background: var(--bg-inset) !important; }
+[data-theme="light"] .bg-dark-800  { background: var(--bg-card) !important; }
+[data-theme="light"] .bg-dark-700  { background: var(--bg-elevated) !important; }
+[data-theme="light"] .bg-dark-600  { background: #E5E7EB !important; }
+
+/* Background with opacity variants */
+[data-theme="light"] .bg-dark-900\/80  { background: rgba(255, 255, 255, 0.90) !important; }
+[data-theme="light"] .bg-dark-900\/50  { background: rgba(249, 250, 251, 0.80) !important; }
+[data-theme="light"] .bg-dark-900\/95  { background: rgba(255, 255, 255, 0.97) !important; }
+[data-theme="light"] .bg-dark-700\/50  { background: rgba(243, 244, 246, 0.60) !important; }
+
+/* Modal overlay */
+[data-theme="light"] .bg-black\/70 { background: rgba(0, 0, 0, 0.35) !important; }
+
+/* Subtle white backgrounds → subtle gray */
+[data-theme="light"] .bg-white\/5   { background: rgba(0, 0, 0, 0.03) !important; }
+[data-theme="light"] .bg-white\/10  { background: rgba(0, 0, 0, 0.05) !important; }
+
+/* ─── Text Colors ─── */
+[data-theme="light"] .text-white    { color: var(--text-heading) !important; }
+[data-theme="light"] .text-gray-200 { color: #1F2937 !important; }
+[data-theme="light"] .text-gray-300 { color: #374151 !important; }
+[data-theme="light"] .text-gray-400 { color: #4B5563 !important; }
+[data-theme="light"] .text-gray-500 { color: #6B7280 !important; }
+[data-theme="light"] .text-gray-600 { color: #9CA3AF !important; }
+[data-theme="light"] .text-gray-700 { color: #9CA3AF !important; }
+
+/* ─── Border Colors ─── */
+[data-theme="light"] .border-dark-800 { border-color: #E5E7EB !important; }
+[data-theme="light"] .border-dark-700 { border-color: #E5E7EB !important; }
+[data-theme="light"] .border-dark-600 { border-color: #D1D5DB !important; }
+[data-theme="light"] .border-dark-500 { border-color: #CBD5E1 !important; }
+[data-theme="light"] .border-dark-400 { border-color: #94A3B8 !important; }
+[data-theme="light"] .border-white\/10 { border-color: rgba(0, 0, 0, 0.08) !important; }
+[data-theme="light"] .border-white\/5  { border-color: rgba(0, 0, 0, 0.05) !important; }
+
+/* ─── Divide Colors ─── */
+[data-theme="light"] .divide-dark-700 > * + * { border-color: #E5E7EB !important; }
+
+/* ─── Hover States ─── */
+[data-theme="light"] .hover\:bg-dark-700:hover  { background: #F3F4F6 !important; }
+[data-theme="light"] .hover\:bg-dark-600:hover  { background: #E5E7EB !important; }
+[data-theme="light"] .hover\:text-white:hover    { color: #111827 !important; }
+[data-theme="light"] .hover\:border-dark-400:hover { border-color: #94A3B8 !important; }
+[data-theme="light"] .hover\:bg-white\/5:hover  { background: rgba(0, 0, 0, 0.04) !important; }
+[data-theme="light"] .hover\:bg-white\/10:hover { background: rgba(0, 0, 0, 0.06) !important; }
+[data-theme="light"] .hover\:border-blue-500\/50:hover { border-color: rgba(59, 130, 246, 0.4) !important; }
+
+/* ─── Inputs & Selects ─── */
+[data-theme="light"] input,
+[data-theme="light"] select {
+  background: var(--bg-input) !important;
+  border-color: var(--border) !important;
+  color: var(--text-primary) !important;
+}
+[data-theme="light"] input::placeholder {
+  color: var(--text-faint) !important;
+}
+[data-theme="light"] input:focus,
+[data-theme="light"] select:focus {
+  border-color: #3b82f6 !important;
+}
+
+/* Select option styling for light mode */
+[data-theme="light"] option {
+  background: #FFFFFF;
+  color: #111827;
+}
+
+/* ─── Tables ─── */
+[data-theme="light"] table th {
+  color: #4B5563 !important;
+  background: rgba(249, 250, 251, 0.8) !important;
+}
+[data-theme="light"] table td {
+  color: #1F2937 !important;
+}
+[data-theme="light"] table tr:hover {
+  background: rgba(0, 0, 0, 0.02) !important;
+}
+
+/* ─── Header ─── */
+[data-theme="light"] header {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+[data-theme="light"] .backdrop-blur-xl {
+  backdrop-filter: blur(20px);
+}
+
+/* ─── Cards & Surfaces ─── */
+[data-theme="light"] .bg-dark-800.rounded-xl,
+[data-theme="light"] .bg-dark-800.rounded-2xl {
+  box-shadow: var(--card-shadow) !important;
+}
+
+/* ─── Footer ─── */
+[data-theme="light"] footer {
+  border-color: #E5E7EB !important;
+}
+
+/* ─── Gradient Backgrounds (Insight Banner) ─── */
+[data-theme="light"] .from-blue-500\/5 {
+  --tw-gradient-from: rgba(59, 130, 246, 0.04);
+}
+[data-theme="light"] .to-purple-500\/5 {
+  --tw-gradient-to: rgba(139, 92, 246, 0.04);
+}
+[data-theme="light"] .bg-gradient-to-r.from-blue-500\/5 {
+  background: linear-gradient(to right, rgba(59, 130, 246, 0.06), rgba(139, 92, 246, 0.06)) !important;
+  border-color: #E5E7EB !important;
+}
+
+/* ─── Spinner Border ─── */
+[data-theme="light"] .border-dark-600 {
+  border-color: #D1D5DB !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Scrollbar
+   ═══════════════════════════════════════════════════════ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-hover);
+}
+
+/* ═══════════════════════════════════════════════════════
+   Animations
+   ═══════════════════════════════════════════════════════ */
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, var(--shimmer-a) 25%, var(--shimmer-b) 50%, var(--shimmer-a) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Theme Transition (Smooth Toggle)
+   ═══════════════════════════════════════════════════════ */
+
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+
+/* Disable transition on animations and animated elements */
+.shimmer, .shimmer *,
+[class*="animate-"],
+.recharts-surface,
+.recharts-surface * {
+  transition: none !important;
+}
